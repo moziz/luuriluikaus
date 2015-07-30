@@ -1,0 +1,1 @@
+Laita tähän kansioon kaikki Unityssa tarvittavat roinat, joita ei kuitenkaan haluta versionhallintaan (esim. UnityVS)
