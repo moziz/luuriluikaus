@@ -5,6 +5,7 @@ public class PlayerCharacter : MonoBehaviour
 {
     public float speendDropOff = 0.1f;
     public float speedMultiplier = 0.1f;
+    public float minSpeed = 0.01f;
     public float jumpHeight = 1;
     public float jumpSpeed = 1;
     public float animationSpeedMultipler = 0.1f;
@@ -17,7 +18,8 @@ public class PlayerCharacter : MonoBehaviour
     public List<Texture> fallAnimation = new List<Texture>();
     public List<Texture> hurlAnimation = new List<Texture>();
 
-    public Transform throwableItem;
+    public Transform throwableItemPrefab;
+    private ThrowableItem currentItem;
     public GameObject throwFan;
 
     private Material mat;
@@ -39,8 +41,14 @@ public class PlayerCharacter : MonoBehaviour
     public float ownDeltaTime = 1;
     public bool slowDownTime = false;
     public bool readyToHurl = false;
+    public bool useDebugControls = false;
+    private bool gameOver = false;
+    private Vector3 originalPosition;
+    private float gameOverTime = 0;
+
     void Start()
     {
+        originalPosition = transform.position;
         defaultHeight = transform.position.y;
         mat = GetComponent<MeshRenderer>().material;
 
@@ -49,6 +57,10 @@ public class PlayerCharacter : MonoBehaviour
         throwFan = transform.FindChild("ThrowFan").gameObject;
         throwFan.SetActive(false);
 
+        {
+            currentItem = Instantiate(throwableItemPrefab).GetComponent<ThrowableItem>();
+        }
+
         GameObject phone = GameObject.Find("Phone");
         if(phone)
         {
@@ -56,11 +68,42 @@ public class PlayerCharacter : MonoBehaviour
             p.SubscribeOnRotaryEnd(UnrollFinished);
             p.SubscribeOnRotaryRelease(NumberSelected);
         }
+        else
+        {
+            useDebugControls = true;
+        }
+
+        currentSpeed = minSpeed;
+        targetSpeed = currentSpeed;
     }
 
     void Update()
     {
-        DoTempControls();
+        if (gameOver)
+        {
+            if (gameOverTime == 0)
+            {
+                gameOverTime = Time.time + 0.5f;
+            }
+
+            if (gameOverTime < Time.time)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    transform.position = originalPosition;
+                    gameOverTime = 0;
+                    gameOver = false;
+                    Start();
+                }
+            }
+            return;
+        }
+
+        if (useDebugControls || Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            useDebugControls = true;
+            DoTempControls();
+        }
 
         if (slowDownTime)
         {
@@ -75,7 +118,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (slowingDown && !isJumping)
         {
-            currentSpeed = Mathf.Max(0, currentSpeed - speendDropOff * localDeltaTime);
+            currentSpeed = Mathf.Max(minSpeed, currentSpeed - speendDropOff * localDeltaTime);
         }
         else if (!slowingDown)
         {
@@ -114,8 +157,6 @@ public class PlayerCharacter : MonoBehaviour
     {
         if (number == selectedNumber)
             return;
-        Debug.Log("NumberSelected OK -> " + number + ", old: " + selectedNumber);
-
 
         selectedNumber = number;
 
@@ -174,10 +215,10 @@ public class PlayerCharacter : MonoBehaviour
         throwFan.SetActive(false);
         ChangeAnimation("throw");
         slowDownTime = false;
-
-        ThrowableItem it = GameObject.Find("ThrowableItem").GetComponent<ThrowableItem>();
-        it.GetThrown();
-        ThrowMe(it.GetComponent<Rigidbody>());
+        goingUp = false; // Start falling if was mid-jump
+        
+        currentItem.GetThrown();
+        ThrowMe(currentItem.GetComponent<Rigidbody>());
 
         SetSpeed(1);
         selectedNumber = -1;
@@ -287,6 +328,11 @@ public class PlayerCharacter : MonoBehaviour
     public void ThrowMe(Rigidbody r)
     {
         r.velocity = new Vector3(currentSpeed, 0, 0);
-        r.AddForce(new Vector3(forwardVolleyForce + currentSpeed, upwardVolleyForce + currentHeight));
+        r.AddForce(new Vector3(forwardVolleyForce * (0.8f + Random.value) + currentSpeed, upwardVolleyForce * (0.8f + Random.value) + currentHeight));
+    }
+
+    public void Stop()
+    {
+        gameOver = true;
     }
 }

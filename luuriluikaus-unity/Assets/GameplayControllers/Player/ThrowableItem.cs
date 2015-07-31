@@ -1,6 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+[System.Serializable]
+public class ItemData
+{
+    public Transform visuals;
+    public float mass = 0.1f;
+    public float drag = 0.0f;
+    public float angularDrag = 0.05f;
+    public Vector3 gravity = new Vector3(0, -1, 0);
+}
+
+
 public class ThrowableItem : MonoBehaviour
 {
     bool inHand = true;
@@ -13,9 +24,24 @@ public class ThrowableItem : MonoBehaviour
 
     public Vector3 offset = new Vector3(-1.0f, 1.0f, 1.0f);
 
-    void Start()
+    public List<ItemData> items = new List<ItemData>();
+
+    void Awake()
     {
         player = GameObject.Find("Player").transform;
+
+        if (items.Count == 0) return;
+
+        int itemIndex = Random.Range(0, items.Count);
+        Rigidbody r = GetComponent<Rigidbody>();
+
+        ItemData it = items[itemIndex];
+        Instantiate<Transform>(it.visuals).parent = transform;
+        r.mass = it.mass;
+        r.drag = it.drag;
+        Physics.gravity = it.gravity;
+
+        LateUpdate();
     }
 
     void LateUpdate()
@@ -37,7 +63,7 @@ public class ThrowableItem : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        Debug.Log("THROWABLE COLLISION " + col.gameObject.name);
+        // Debug.Log("THROWABLE COLLISION " + col.gameObject.name);
 
         if (col.gameObject.layer == LayerMask.NameToLayer("PlayerThrow"))
         {
@@ -56,7 +82,8 @@ public class ThrowableItem : MonoBehaviour
                 inTheAir = false;
                 inGround = true;
             }
-            GetComponent<Rigidbody>().isKinematic = true;
+            
+            HitTheGround();
         }
     }
 
@@ -64,5 +91,18 @@ public class ThrowableItem : MonoBehaviour
     void OnCollisionEnter(Collision coll)
     {
         OnTriggerEnter(coll.collider);
+    }
+
+    void HitTheGround()
+    {
+        GetComponent<Rigidbody>().isKinematic = true;
+
+        // TODO: Gameover
+
+        PlayerCharacter p = GameObject.Find("Player").GetComponent<PlayerCharacter>();
+        Debug.Log("GameOver");
+        p.Stop();
+
+        Destroy(this);
     }
 }
