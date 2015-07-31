@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    public float speendDropOff = 0.1f;
+    public float speedDropOff = 0.5f;
     public float speedMultiplier = 0.1f;
     public float minSpeed = 0.01f;
     public float jumpHeight = 1;
@@ -17,7 +17,10 @@ public class PlayerCharacter : MonoBehaviour
     public  List<Sprite> carryAnimation = new List<Sprite>();
     public  List<Sprite> jumpAnimation =  new List<Sprite>();
     public  List<Sprite> fallAnimation =  new List<Sprite>();
-    public  List<Sprite> hurlAnimation =  new List<Sprite>();
+    public List<Sprite> hurlAnimation =   new List<Sprite>();
+    public List<Sprite> tripAnimation =   new List<Sprite>();
+    public List<Sprite> dieAnimation =    new List<Sprite>();
+    public List<Sprite> giveUpAnimation = new List<Sprite>();
     private SpriteRenderer spriteRenderer;
 
     public Transform throwableItemPrefab;
@@ -44,6 +47,9 @@ public class PlayerCharacter : MonoBehaviour
     public bool slowDownTime = false;
     public bool readyToHurl = false;
     public bool useDebugControls = false;
+    private bool gameEnding = false;
+    private bool tripAndFall = false;
+    private bool dropAndGiveUp = false;
     private bool gameOver = false;
     private Vector3 originalPosition;
     private float gameOverTime = 0;
@@ -82,9 +88,15 @@ public class PlayerCharacter : MonoBehaviour
         targetSpeed = currentSpeed;
 
         pointer = transform.FindChild("Pointer");
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        Transform spriteTransform = transform.FindChild("PlayerSprite");
+        spriteRenderer = spriteTransform.GetComponentInChildren<SpriteRenderer>();
         hasThrown = false;
         throwing = false;
+        dropAndGiveUp = false;
+        tripAndFall = false;
+        gameEnding = false;
+        gameOver = false;
+        selectedNumber = -1;
     }
 
     void Update()
@@ -102,11 +114,30 @@ public class PlayerCharacter : MonoBehaviour
                 {
                     transform.position = originalPosition;
                     gameOverTime = 0;
-                    gameOver = false;
+                    tripAndFall = false;
                     Start();
                 }
             }
+            
+            DoAnimation();
             return;
+        }
+
+        if (!gameOver && gameEnding && !isJumping)
+        {
+            if (tripAndFall)
+            {
+                ChangeAnimation("trip");
+            }
+            else if(dropAndGiveUp)
+            {
+                ChangeAnimation("giveUp");
+                gameOver = true;
+            }
+            else
+            {
+                Debug.LogError("FAILURE IN GAME ENDING");
+            }    
         }
 
         if (useDebugControls || Input.GetKeyDown(KeyCode.Alpha9))
@@ -129,9 +160,16 @@ public class PlayerCharacter : MonoBehaviour
         if (slowingDown && !isJumping)
         {
             float oldSpeed = currentSpeed;
-            currentSpeed = Mathf.Max(0, currentSpeed - speendDropOff * localDeltaTime);
+            currentSpeed = Mathf.Max(0, currentSpeed - (!gameEnding ? speedDropOff : 0.2f) * localDeltaTime);
 
-            if (!throwing)
+            if(gameEnding)
+            {
+                if(currentSpeed <= minSpeed && currentAnimation == tripAnimation)
+                {
+                    ChangeAnimation("die");
+                }
+            }
+            else if (!throwing)
             {
                 if (currentSpeed < minSpeed)
                 {
@@ -184,16 +222,16 @@ public class PlayerCharacter : MonoBehaviour
         
         DoAnimation();
 
-        if(pointer != null)
+        if(pointer != null && !gameEnding)
         {
             Transform target = currentItem.transform;
             pointer.LookAt(target, -Vector3.forward);
             float distance = (target.position - transform.position).magnitude;
-            if (distance > 6)
+            if (distance > 10 || (transform.position.x - target.position.x) > 5 || (transform.position.y - target.position.y) > 5)
             {
                 pointer.gameObject.SetActive(true);
             }
-            else if (distance < 5)
+            else if (distance < 6)
             {
                 pointer.gameObject.SetActive(false);
             }
@@ -202,7 +240,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
-        if (number == selectedNumber)
+        if (number == selectedNumber || gameEnding)
             return;
 
         selectedNumber = number;
@@ -334,13 +372,28 @@ public class PlayerCharacter : MonoBehaviour
                 currentAnimation = carryAnimation;
             }
         }
+        else if (animationName == "trip")
+        {
+            currentAnimation = tripAnimation;
+        }
+        else if (animationName == "die")
+        {
+            currentAnimation = dieAnimation;
+        }
         else if (animationName == "jump")
         {
             currentAnimation = jumpAnimation;
         }
         else if (animationName == "stand")
         {
-            currentAnimation = standAnimation;
+            if(gameOver)
+            {
+                currentAnimation = dieAnimation;
+            }
+            else
+            {
+                currentAnimation = standAnimation;
+            }
         }
         else if (animationName == "fall")
         {
@@ -349,6 +402,10 @@ public class PlayerCharacter : MonoBehaviour
         else if (animationName == "throw")
         {
             currentAnimation = hurlAnimation;
+        }
+        else if (animationName == "giveUp")
+        {
+            currentAnimation = giveUpAnimation;
         }
         else
         {
@@ -365,7 +422,11 @@ public class PlayerCharacter : MonoBehaviour
 
     void ChangeAppropriateAnimation()
     {
-        if (isJumping)
+        if(gameEnding)
+        {
+
+        }
+        else if (isJumping)
         {
             if (goingUp)
             {
@@ -391,10 +452,10 @@ public class PlayerCharacter : MonoBehaviour
 
     void DoAnimation()
     {
-        float animationFrameSwapTime = lastAnimationFrameSwap + (animationSpeedMultipler / Mathf.Max(1, currentSpeed / speedMultiplier)) * ownDeltaTime;
+        float animationFrameSwapTime = lastAnimationFrameSwap + (animationSpeedMultipler / Mathf.Max(1, currentSpeed / speedMultiplier) / ownDeltaTime);
 
         // Hurl animation is non-looping
-        if (currentAnimation == hurlAnimation)
+        if (currentAnimation == hurlAnimation || tripAnimation == currentAnimation || currentAnimation == giveUpAnimation)
         {
             animationFrameSwapTime = lastAnimationFrameSwap + animationSpeedMultipler / ownDeltaTime * 0.3f;
             if (animationFrameSwapTime <= Time.time && currentAnimation.Count > 0)
@@ -407,7 +468,10 @@ public class PlayerCharacter : MonoBehaviour
                 }
                 else
                 {
-                    throwing = false;
+                    if (currentAnimation == hurlAnimation)
+                        throwing = false;
+                    else if (currentAnimation == tripAnimation)
+                        gameOver = currentSpeed <= minSpeed;
                     ChangeAppropriateAnimation();
                 }
             }
@@ -439,8 +503,17 @@ public class PlayerCharacter : MonoBehaviour
         r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed) * forwardForce, upwardVolleyForce * (0.8f + Random.value) + currentHeight) * upForce);
     }
 
+    public void TripAndFall()
+    {
+        gameEnding = true;
+        tripAndFall = true;
+        slowingDown = true;
+    }
+
     public void Stop()
     {
-        gameOver = true;
+        gameEnding = true;
+        dropAndGiveUp = true;
+        slowingDown = true;
     }
 }

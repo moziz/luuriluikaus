@@ -66,6 +66,11 @@ public class ThrowableItem : MonoBehaviour
 
     public void GetThrown()
     {
+        // Get in front of player
+        Vector3 pos = transform.position;
+        pos.z = player.position.z - 2;
+        transform.position = pos;
+
         inHand = false;
         inTheAir = true;
         inGround = false;
@@ -74,8 +79,6 @@ public class ThrowableItem : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        // Debug.Log("THROWABLE COLLISION " + col.gameObject.name);
-
         if (col.gameObject.layer == LayerMask.NameToLayer("PlayerThrow"))
         {
             // Player collider hit
