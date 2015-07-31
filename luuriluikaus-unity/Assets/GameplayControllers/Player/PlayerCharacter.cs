@@ -329,7 +329,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (currentAnimation != oldAnimation)
         {
-            Debug.Log("ChangingAnimation: " + animationName);
+            // Debug.Log("ChangingAnimation: " + animationName);
             lastAnimationFrameSwap = -100;
             animationFrame = -1;
         }
