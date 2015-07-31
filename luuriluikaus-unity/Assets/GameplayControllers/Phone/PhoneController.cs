@@ -53,8 +53,6 @@ public class PhoneController : MonoBehaviour {
         rotaryCollider = rotaryObject.GetComponent<Collider>();
         rotaryTrans = rotaryObject.GetComponent<Transform>();
 
-        inputCenterPoint = viewportCamera.WorldToScreenPoint(rotaryTrans.position);
-
         originalOrientation = rotaryTrans.rotation;
     }
 
@@ -63,6 +61,7 @@ public class PhoneController : MonoBehaviour {
     }
 
     void Update() {
+        inputCenterPoint = viewportCamera.WorldToScreenPoint(rotaryTrans.position);
         Vector2 clickPos = Input.mousePosition;
 
         if (Input.GetMouseButtonDown(0) && !isRotating) {
