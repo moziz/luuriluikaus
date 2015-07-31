@@ -48,8 +48,14 @@ public class PlayerCharacter : MonoBehaviour
 
         throwFan = transform.FindChild("ThrowFan").gameObject;
         throwFan.SetActive(false);
-        
-        // TODO: rekisteröidy delegaatteihin
+
+        GameObject phone = GameObject.Find("Phone");
+        if(phone)
+        {
+            PhoneController p = phone.GetComponent<PhoneController>();
+            p.SubscribeOnRotaryEnd(UnrollFinished);
+            p.SubscribeOnRotaryRelease(NumberSelected);
+        }
     }
 
     void Update()
