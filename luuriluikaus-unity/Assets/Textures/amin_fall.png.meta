@@ -1,15 +1,14 @@
 fileFormatVersion: 2
-guid: 39af62df5d9e717448124d46740d94a5
-timeCreated: 1438371366
+guid: bad1ead804b24084f9e7c6ef0ece418d
+timeCreated: 1438379191
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: anim_throw1234_jump_56_0
-    21300002: anim_throw1234_jump_56_1
-    21300004: anim_throw1234_jump_56_2
-    21300006: anim_throw1234_jump_56_3
-    21300008: anim_throw1234_jump_56_4
-    21300010: anim_throw1234_jump_56_5
+    21300000: amin_fall_0
+    21300002: amin_fall_1
+    21300004: amin_fall_2
+    21300006: amin_fall_3
+    21300008: amin_fall_4
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -36,7 +35,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: 0
-    aniso: 16
+    aniso: -1
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
@@ -55,65 +54,55 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: anim_throw1234_jump_56_0
+    - name: amin_fall_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 39
-        width: 21
-        height: 31
+        x: 3
+        y: 60
+        width: 27
+        height: 34
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_1
+    - name: amin_fall_1
       rect:
         serializedVersion: 2
         x: 35
-        y: 39
-        width: 22
-        height: 28
+        y: 60
+        width: 34
+        height: 34
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_2
+    - name: amin_fall_2
       rect:
         serializedVersion: 2
-        x: 68
-        y: 39
-        width: 21
-        height: 31
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_3
-      rect:
-        serializedVersion: 2
-        x: 4
-        y: 1
-        width: 26
+        x: 3
+        y: 27
+        width: 44
         height: 26
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: .269343942, y: .611525893}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_4
+    - name: amin_fall_3
       rect:
         serializedVersion: 2
-        x: 36
+        x: 52
+        y: 27
+        width: 37
+        height: 23
+      alignment: 9
+      pivot: {x: .214510635, y: .635077953}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: amin_fall_4
+      rect:
+        serializedVersion: 2
+        x: 3
         y: 5
-        width: 25
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_5
-      rect:
-        serializedVersion: 2
-        x: 67
-        y: 0
-        width: 23
-        height: 33
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 49
+        height: 11
+      alignment: 9
+      pivot: {x: .280199468, y: 1.15901709}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
