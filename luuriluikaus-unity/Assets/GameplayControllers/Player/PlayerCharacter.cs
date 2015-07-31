@@ -46,6 +46,8 @@ public class PlayerCharacter : MonoBehaviour
     private Vector3 originalPosition;
     private float gameOverTime = 0;
 
+    Transform pointer;
+
     void Start()
     {
         originalPosition = transform.position;
@@ -62,7 +64,7 @@ public class PlayerCharacter : MonoBehaviour
         }
 
         GameObject phone = GameObject.Find("Phone");
-        if(phone)
+        if (phone)
         {
             PhoneController p = phone.GetComponent<PhoneController>();
             p.SubscribeOnRotaryEnd(UnrollFinished);
@@ -75,6 +77,8 @@ public class PlayerCharacter : MonoBehaviour
 
         currentSpeed = minSpeed;
         targetSpeed = currentSpeed;
+
+        pointer = transform.FindChild("Pointer");
     }
 
     void Update()
@@ -118,7 +122,12 @@ public class PlayerCharacter : MonoBehaviour
 
         if (slowingDown && !isJumping)
         {
-            currentSpeed = Mathf.Max(minSpeed, currentSpeed - speendDropOff * localDeltaTime);
+            currentSpeed = Mathf.Max(0, currentSpeed - speendDropOff * localDeltaTime);
+
+            if (currentSpeed < minSpeed)
+            {
+                ChangeAnimation("stand");
+            }
         }
         else if (!slowingDown)
         {
@@ -143,14 +152,30 @@ public class PlayerCharacter : MonoBehaviour
                 currentHeight = defaultHeight;
                 isJumping = false;
                 SetSpeed(1);
+                ChangeAnimation("run");
             }
         }
 
         Vector2 pos = transform.position + new Vector3(currentSpeed * (localDeltaTime * 60.0f), 0, 0);
         pos.y = currentHeight;
         transform.position = pos;
-
+        
         DoAnimation();
+
+        if(pointer != null)
+        {
+            Transform target = currentItem.transform;
+            pointer.LookAt(target, -Vector3.forward);
+            float distance = (target.position - transform.position).magnitude;
+            if (distance > 6)
+            {
+                pointer.gameObject.SetActive(true);
+            }
+            else if (distance < 5)
+            {
+                pointer.gameObject.SetActive(false);
+            }
+        }
     }
 
     void NumberSelected(int number)
@@ -169,9 +194,9 @@ public class PlayerCharacter : MonoBehaviour
         {
             slowingDown = false;
 
-            if (number == 1)
+            if (number == 1 && !readyToHurl)
             {
-                if(!isJumping)
+                if (!isJumping)
                     Jump();
             }
             else
@@ -216,9 +241,13 @@ public class PlayerCharacter : MonoBehaviour
         ChangeAnimation("throw");
         slowDownTime = false;
         goingUp = false; // Start falling if was mid-jump
-        
+
         currentItem.GetThrown();
-        ThrowMe(currentItem.GetComponent<Rigidbody>());
+
+        float forward = Mathf.Cos(number * 9 * Mathf.Deg2Rad);
+        float up = Mathf.Sin(number * 10 * Mathf.Deg2Rad);
+
+        ThrowMe(currentItem.GetComponent<Rigidbody>(), forward * currentItem.forwardForceMult, up * currentItem.upwardForceMult);
 
         SetSpeed(1);
         selectedNumber = -1;
@@ -271,6 +300,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void ChangeAnimation(string animationName)
     {
+
         List<Texture> oldAnimation = currentAnimation;
         if (animationName == "run")
         {
@@ -305,9 +335,56 @@ public class PlayerCharacter : MonoBehaviour
         }
     }
 
+    void ChangeAppropriateAnimation()
+    {
+        if (isJumping)
+        {
+            if (goingUp)
+            {
+                ChangeAnimation("jump");
+            }
+            else
+            {
+                ChangeAnimation("fall");
+            }
+        }
+        else
+        {
+            if (currentSpeed > minSpeed)
+            {
+                ChangeAnimation("run");
+            }
+            else
+            {
+                ChangeAnimation("stand");
+            }
+        }
+    }
+
     void DoAnimation()
     {
         float animationFrameSwapTime = lastAnimationFrameSwap + (animationSpeedMultipler / Mathf.Max(1, currentSpeed / speedMultiplier)) * ownDeltaTime;
+
+        // Hurl animation is non-looping
+        if (currentAnimation == hurlAnimation)
+        {
+            animationFrameSwapTime = lastAnimationFrameSwap + animationSpeedMultipler / ownDeltaTime;
+            if (animationFrameSwapTime <= Time.time && currentAnimation.Count > 0)
+            {
+                lastAnimationFrameSwap = Time.time;
+                animationFrame = animationFrame + 1;
+                if (animationFrame < currentAnimation.Count)
+                {
+                    mat.mainTexture = currentAnimation[animationFrame];
+                }
+                else
+                {
+                    ChangeAppropriateAnimation();
+                }
+            }
+            return;
+        }
+
         if (animationFrameSwapTime <= Time.time && currentAnimation.Count > 0)
         {
             lastAnimationFrameSwap = Time.time;
@@ -319,16 +396,17 @@ public class PlayerCharacter : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.layer == LayerMask.NameToLayer("DropZone"))
+        if (col.gameObject.layer == LayerMask.NameToLayer("DropZone"))
         {
             DropZoneReached();
         }
     }
 
-    public void ThrowMe(Rigidbody r)
+    public void ThrowMe(Rigidbody r, float forwardForce, float upForce)
     {
+        ChangeAnimation("throw");
         r.velocity = new Vector3(currentSpeed, 0, 0);
-        r.AddForce(new Vector3(forwardVolleyForce * (0.8f + Random.value) + currentSpeed, upwardVolleyForce * (0.8f + Random.value) + currentHeight));
+        r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed) * forwardForce, upwardVolleyForce * (0.8f + Random.value) + currentHeight) * upForce);
     }
 
     public void Stop()

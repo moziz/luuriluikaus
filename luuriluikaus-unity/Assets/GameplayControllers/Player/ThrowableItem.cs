@@ -4,20 +4,25 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ItemData
 {
+    public string name;
     public Transform visuals;
     public float mass = 0.1f;
     public float drag = 0.0f;
     public float angularDrag = 0.05f;
+    public float upwardForceMult = 1f;
+    public float forwardForceMult = 1f;
     public Vector3 gravity = new Vector3(0, -1, 0);
 }
 
 
 public class ThrowableItem : MonoBehaviour
 {
-    bool inHand = true;
-    bool inTheAir = false;
-    bool inGround = false;
+    public bool inHand = true;
+    public bool inTheAir = false;
+    public bool inGround = false;
 
+    public float upwardForceMult = 1f;
+    public float forwardForceMult = 1f;
     public Vector2 startForceDirection = Vector2.zero;
 
     public Transform player;
@@ -40,6 +45,12 @@ public class ThrowableItem : MonoBehaviour
         r.mass = it.mass;
         r.drag = it.drag;
         Physics.gravity = it.gravity;
+        upwardForceMult = it.upwardForceMult;
+        forwardForceMult = it.forwardForceMult;
+
+        inHand = true;
+        inTheAir = false;
+        inGround = false;
 
         LateUpdate();
     }
@@ -70,7 +81,7 @@ public class ThrowableItem : MonoBehaviour
             // Player collider hit
             if (inTheAir)
             {
-                col.transform.parent.GetComponent<PlayerCharacter>().ThrowMe(GetComponent<Rigidbody>());
+                col.transform.parent.GetComponent<PlayerCharacter>().ThrowMe(GetComponent<Rigidbody>(), forwardForceMult, upwardForceMult);
                 GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-100, 100));
             }
         }
@@ -82,7 +93,7 @@ public class ThrowableItem : MonoBehaviour
                 inTheAir = false;
                 inGround = true;
             }
-            
+
             HitTheGround();
         }
     }
