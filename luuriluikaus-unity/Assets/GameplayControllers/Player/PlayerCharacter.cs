@@ -11,12 +11,14 @@ public class PlayerCharacter : MonoBehaviour
     public float animationSpeedMultipler = 0.1f;
     public float upwardVolleyForce = 1.0f;
     public float forwardVolleyForce = 1.0f;
-    private List<Texture> currentAnimation;
-    public List<Texture> standAnimation = new List<Texture>();
-    public List<Texture> runAnimation = new List<Texture>();
-    public List<Texture> jumpAnimation = new List<Texture>();
-    public List<Texture> fallAnimation = new List<Texture>();
-    public List<Texture> hurlAnimation = new List<Texture>();
+    private List<Sprite> currentAnimation;
+    public  List<Sprite> standAnimation = new List<Sprite>();
+    public  List<Sprite> runAnimation  =  new List<Sprite>();
+    public  List<Sprite> carryAnimation = new List<Sprite>();
+    public  List<Sprite> jumpAnimation =  new List<Sprite>();
+    public  List<Sprite> fallAnimation =  new List<Sprite>();
+    public  List<Sprite> hurlAnimation =  new List<Sprite>();
+    private SpriteRenderer spriteRenderer;
 
     public Transform throwableItemPrefab;
     private ThrowableItem currentItem;
@@ -45,7 +47,8 @@ public class PlayerCharacter : MonoBehaviour
     private bool gameOver = false;
     private Vector3 originalPosition;
     private float gameOverTime = 0;
-
+    public bool hasThrown = false;
+    public bool throwing = false;
     Transform pointer;
 
     void Start()
@@ -79,6 +82,9 @@ public class PlayerCharacter : MonoBehaviour
         targetSpeed = currentSpeed;
 
         pointer = transform.FindChild("Pointer");
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        hasThrown = false;
+        throwing = false;
     }
 
     void Update()
@@ -122,11 +128,25 @@ public class PlayerCharacter : MonoBehaviour
 
         if (slowingDown && !isJumping)
         {
+            float oldSpeed = currentSpeed;
             currentSpeed = Mathf.Max(0, currentSpeed - speendDropOff * localDeltaTime);
 
-            if (currentSpeed < minSpeed)
+            if (!throwing)
             {
-                ChangeAnimation("stand");
+                if (currentSpeed < minSpeed)
+                {
+                    if (oldSpeed >= minSpeed)
+                    {
+                        ChangeAnimation("stand");
+                    }
+                }
+                else
+                {
+                    if (oldSpeed < minSpeed)
+                    {
+                        ChangeAnimation("run");
+                    }
+                }
             }
         }
         else if (!slowingDown)
@@ -141,7 +161,8 @@ public class PlayerCharacter : MonoBehaviour
             {
                 currentHeight = defaultHeight + jumpHeight;
                 goingUp = false;
-                ChangeAnimation("fall");
+                if(!throwing)
+                    ChangeAnimation("fall");
             }
         }
         else if (currentHeight > defaultHeight)
@@ -152,7 +173,8 @@ public class PlayerCharacter : MonoBehaviour
                 currentHeight = defaultHeight;
                 isJumping = false;
                 SetSpeed(1);
-                ChangeAnimation("run");
+                if (!throwing)
+                    ChangeAnimation("run");
             }
         }
 
@@ -238,10 +260,10 @@ public class PlayerCharacter : MonoBehaviour
     void Hurl(int number)
     {
         throwFan.SetActive(false);
-        ChangeAnimation("throw");
         slowDownTime = false;
         goingUp = false; // Start falling if was mid-jump
-
+        hasThrown = true;
+        
         currentItem.GetThrown();
 
         float forward = Mathf.Cos(number * 9 * Mathf.Deg2Rad);
@@ -300,11 +322,17 @@ public class PlayerCharacter : MonoBehaviour
 
     void ChangeAnimation(string animationName)
     {
-
-        List<Texture> oldAnimation = currentAnimation;
+        List<Sprite> oldAnimation = currentAnimation;
         if (animationName == "run")
         {
-            currentAnimation = runAnimation;
+            if (hasThrown)
+            {
+                currentAnimation = runAnimation;
+            }
+            else
+            {
+                currentAnimation = carryAnimation;
+            }
         }
         else if (animationName == "jump")
         {
@@ -320,7 +348,7 @@ public class PlayerCharacter : MonoBehaviour
         }
         else if (animationName == "throw")
         {
-            currentAnimation = fallAnimation;
+            currentAnimation = hurlAnimation;
         }
         else
         {
@@ -329,7 +357,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (currentAnimation != oldAnimation)
         {
-            // Debug.Log("ChangingAnimation: " + animationName);
+            Debug.Log("ChangingAnimation: " + animationName);
             lastAnimationFrameSwap = -100;
             animationFrame = -1;
         }
@@ -368,17 +396,18 @@ public class PlayerCharacter : MonoBehaviour
         // Hurl animation is non-looping
         if (currentAnimation == hurlAnimation)
         {
-            animationFrameSwapTime = lastAnimationFrameSwap + animationSpeedMultipler / ownDeltaTime;
+            animationFrameSwapTime = lastAnimationFrameSwap + animationSpeedMultipler / ownDeltaTime * 0.3f;
             if (animationFrameSwapTime <= Time.time && currentAnimation.Count > 0)
             {
                 lastAnimationFrameSwap = Time.time;
                 animationFrame = animationFrame + 1;
                 if (animationFrame < currentAnimation.Count)
                 {
-                    mat.mainTexture = currentAnimation[animationFrame];
+                    spriteRenderer.sprite = currentAnimation[animationFrame];
                 }
                 else
                 {
+                    throwing = false;
                     ChangeAppropriateAnimation();
                 }
             }
@@ -389,7 +418,7 @@ public class PlayerCharacter : MonoBehaviour
         {
             lastAnimationFrameSwap = Time.time;
             animationFrame = (animationFrame + 1) % (currentAnimation.Count);
-            mat.mainTexture = currentAnimation[animationFrame];
+            spriteRenderer.sprite = currentAnimation[animationFrame];
         }
     }
 
@@ -404,6 +433,7 @@ public class PlayerCharacter : MonoBehaviour
 
     public void ThrowMe(Rigidbody r, float forwardForce, float upForce)
     {
+        throwing = true;
         ChangeAnimation("throw");
         r.velocity = new Vector3(currentSpeed, 0, 0);
         r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed) * forwardForce, upwardVolleyForce * (0.8f + Random.value) + currentHeight) * upForce);
