@@ -69,7 +69,7 @@ public class PlayerCharacter : MonoBehaviour
     public Sprite tutorialDial1;
     public Sprite tutorialVolley;
     public Sprite tutorialRestart;
-
+    
     void Awake()
     {
         GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: 0";
@@ -128,6 +128,7 @@ public class PlayerCharacter : MonoBehaviour
         tripAndFall = false;
         Start();
         tutorialSpriteText.sprite = null;
+        tutorialSpriteText.enabled = false;
     }
 
     void Update()
@@ -269,7 +270,6 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
-        tutorialSpriteText.sprite = null;
         if (gameOver)
         {
             Restart();
@@ -293,6 +293,8 @@ public class PlayerCharacter : MonoBehaviour
             Debug.Log("HURL NUMBER: " + number);
             Hurl(number);
             readyToHurl = false;
+
+            tutorialSpriteText.sprite = tutorialVolley;
         }
         else
         {
@@ -303,9 +305,19 @@ public class PlayerCharacter : MonoBehaviour
             {
                 if (!isJumping)
                     Jump();
+
+                tutorialSpriteText.sprite = null;
             }
             else
             {
+                if(tutorialSpriteText.sprite == tutorialStart)
+                {
+                    tutorialSpriteText.sprite = tutorialDial1;
+                }
+                else if(tutorialSpriteText.sprite != tutorialDial1)
+                {
+                    tutorialSpriteText.sprite = null;
+                }
                 ChangeAnimation("run");
                 SetSpeed(number);
                 targetSpeed = currentSpeed;
@@ -358,8 +370,6 @@ public class PlayerCharacter : MonoBehaviour
 
         currentSpeed = 0;
         selectedNumber = -1;
-
-        tutorialSpriteText.sprite = tutorialVolley;
     }
 
     void DoTempControls()
