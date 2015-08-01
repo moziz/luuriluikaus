@@ -1,19 +1,17 @@
 fileFormatVersion: 2
-guid: 39af62df5d9e717448124d46740d94a5
-timeCreated: 1438371366
+guid: 7b085e79ee983884cab6d99725880649
+timeCreated: 1438379213
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: anim_throw1234_jump_56_0
-    21300002: anim_throw1234_jump_56_1
-    21300004: anim_throw1234_jump_56_2
-    21300006: anim_throw1234_jump_56_3
-    21300008: anim_throw1234_jump_56_4
-    21300010: anim_throw1234_jump_56_5
+    21300000: anim_drop1234_idle56_0
+    21300002: anim_drop1234_idle56_1
+    21300004: anim_drop1234_idle56_2
+    21300006: anim_drop1234_idle56_3
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     linearTexture: 0
     correctGamma: 0
     fadeOut: 0
@@ -55,63 +53,43 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: anim_throw1234_jump_56_0
+    - name: anim_drop1234_idle56_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 39
+        x: 8
+        y: 38
         width: 21
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: anim_drop1234_idle56_1
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 38
+        width: 19
         height: 31
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_1
+    - name: anim_drop1234_idle56_2
       rect:
         serializedVersion: 2
-        x: 35
-        y: 39
-        width: 22
-        height: 28
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_2
-      rect:
-        serializedVersion: 2
-        x: 68
-        y: 39
-        width: 21
+        x: 71
+        y: 38
+        width: 17
         height: 31
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_3
+    - name: anim_drop1234_idle56_3
       rect:
         serializedVersion: 2
-        x: 4
-        y: 1
-        width: 26
-        height: 26
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_4
-      rect:
-        serializedVersion: 2
-        x: 36
-        y: 5
-        width: 25
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: anim_throw1234_jump_56_5
-      rect:
-        serializedVersion: 2
-        x: 67
+        x: 11
         y: 0
-        width: 23
-        height: 33
+        width: 15
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
