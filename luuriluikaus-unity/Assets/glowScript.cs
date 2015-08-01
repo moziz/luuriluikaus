@@ -14,7 +14,7 @@ public class glowScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		myLight.intensity = Mathf.PingPong(Time.time, 1f) + 1f;
+		myLight.intensity = Mathf.PingPong(Time.time*0.2f, 0.5f) + 0.5f;
 	
 	}
 }
