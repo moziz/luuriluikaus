@@ -61,8 +61,7 @@ public class ThrowableItem : MonoBehaviour
         inTheAir = false;
         inGround = false;
         gameEndedForMe = false;
-
-        GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: 0";
+        
 
         LateUpdate();
     }

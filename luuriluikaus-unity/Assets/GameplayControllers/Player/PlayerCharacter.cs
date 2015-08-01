@@ -71,6 +71,8 @@ public class PlayerCharacter : MonoBehaviour
 
     void Awake()
     {
+        GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: 0";
+
         GameObject phone = GameObject.Find("Phone");
         if (phone)
         {
