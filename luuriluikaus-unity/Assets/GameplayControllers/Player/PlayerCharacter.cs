@@ -12,14 +12,15 @@ public class PlayerCharacter : MonoBehaviour
     public float upwardVolleyForce = 1.0f;
     public float forwardVolleyForce = 1.0f;
     private List<Sprite> currentAnimation;
-    public  List<Sprite> standAnimation = new List<Sprite>();
-    public  List<Sprite> runAnimation  =  new List<Sprite>();
-    public  List<Sprite> carryAnimation = new List<Sprite>();
-    public  List<Sprite> jumpAnimation =  new List<Sprite>();
-    public  List<Sprite> fallAnimation =  new List<Sprite>();
-    public List<Sprite> hurlAnimation =   new List<Sprite>();
-    public List<Sprite> tripAnimation =   new List<Sprite>();
-    public List<Sprite> dieAnimation =    new List<Sprite>();
+    public List<Sprite> standAnimation = new List<Sprite>();
+    public List<Sprite> runAnimation   = new List<Sprite>();
+    public List<Sprite> carryAnimation = new List<Sprite>();
+    public List<Sprite> holdAnimation  = new List<Sprite>();
+    public List<Sprite> jumpAnimation  = new List<Sprite>();
+    public List<Sprite> fallAnimation  = new List<Sprite>();
+    public List<Sprite> hurlAnimation  = new List<Sprite>();
+    public List<Sprite> tripAnimation  = new List<Sprite>();
+    public List<Sprite> dieAnimation   = new List<Sprite>();
     public List<Sprite> giveUpAnimation = new List<Sprite>();
     private SpriteRenderer spriteRenderer;
 
@@ -47,14 +48,16 @@ public class PlayerCharacter : MonoBehaviour
     public bool slowDownTime = false;
     public bool readyToHurl = false;
     public bool useDebugControls = false;
-    private bool gameEnding = false;
+    public bool gameEnding = false;
     private bool tripAndFall = false;
     private bool dropAndGiveUp = false;
     public bool gameOver = false;
     private Vector3 originalPosition;
     private float gameOverTime = 0;
     public bool hasThrown = false;
-    public bool throwing = false;
+    private bool throwing = false;
+    private bool justThrew = false;
+    public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
 
     void Start()
@@ -101,6 +104,8 @@ public class PlayerCharacter : MonoBehaviour
 
     void Update()
     {
+        justThrew = false;
+
         if (gameOver)
         {
             if (gameOverTime == 0)
@@ -166,6 +171,7 @@ public class PlayerCharacter : MonoBehaviour
             {
                 if(currentSpeed <= minSpeed && currentAnimation == tripAnimation)
                 {
+                    gameOver = true;
                     ChangeAnimation("die");
                 }
             }
@@ -397,6 +403,10 @@ public class PlayerCharacter : MonoBehaviour
             {
                 currentAnimation = dieAnimation;
             }
+            else if(!hasThrown)
+            {
+                currentAnimation = holdAnimation;
+            }
             else
             {
                 currentAnimation = standAnimation;
@@ -476,7 +486,10 @@ public class PlayerCharacter : MonoBehaviour
                 else
                 {
                     if (currentAnimation == hurlAnimation)
+                    {
                         throwing = false;
+                        justThrew = true;
+                    }
                     else if (currentAnimation == tripAnimation)
                         gameOver = currentSpeed <= minSpeed;
                     ChangeAppropriateAnimation();
@@ -500,6 +513,10 @@ public class PlayerCharacter : MonoBehaviour
         {
             DropZoneReached();
         }
+        else if (col.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+        {
+            TripAndFall();
+        }
     }
 
     public void ThrowMe(Rigidbody r, float forwardForce, float upForce)
@@ -515,6 +532,18 @@ public class PlayerCharacter : MonoBehaviour
         gameEnding = true;
         tripAndFall = true;
         slowingDown = true;
+        
+        Rigidbody r = currentItem.GetComponent<Rigidbody>();
+        currentItem.GetAbandoned();
+
+        if (!hasThrown)
+        {
+            currentItem.GetThrown();
+
+            r.velocity = new Vector3(currentSpeed, 0, 0);
+            r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed), upwardVolleyForce * (0.1f + Random.value * 0.2f) + currentHeight));
+        }
+
     }
 
     public void Stop()

@@ -21,10 +21,13 @@ public class ThrowableItem : MonoBehaviour
     public bool inTheAir = false;
     public bool inGround = false;
 
+    private bool gameEndedForMe = false;
+
     public float upwardForceMult = 1f;
     public float forwardForceMult = 1f;
     public Vector2 startForceDirection = Vector2.zero;
 
+    public Transform obstaclePrefab;
     public Transform player;
 
     public Vector3 offset = new Vector3(-1.0f, 1.0f, 1.0f);
@@ -51,7 +54,7 @@ public class ThrowableItem : MonoBehaviour
         inHand = true;
         inTheAir = false;
         inGround = false;
-
+        gameEndedForMe = false;
         LateUpdate();
     }
 
@@ -77,12 +80,17 @@ public class ThrowableItem : MonoBehaviour
         GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-100, -10));
     }
 
+    public void GetAbandoned()
+    {
+        gameEndedForMe = true;
+    }
+
     void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.layer == LayerMask.NameToLayer("PlayerThrow"))
         {
             // Player collider hit
-            if (inTheAir)
+            if (inTheAir && !gameEndedForMe)
             {
                 col.transform.parent.GetComponent<PlayerCharacter>().ThrowMe(GetComponent<Rigidbody>(), forwardForceMult, upwardForceMult);
                 GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-100, 100));
@@ -90,13 +98,6 @@ public class ThrowableItem : MonoBehaviour
         }
         else if (col.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
-            if (inTheAir)
-            {
-                inHand = false;
-                inTheAir = false;
-                inGround = true;
-            }
-
             HitTheGround();
         }
     }
@@ -109,13 +110,21 @@ public class ThrowableItem : MonoBehaviour
 
     void HitTheGround()
     {
+        inHand = false;
+        inTheAir = false;
+        inGround = true;
+
         GetComponent<Rigidbody>().isKinematic = true;
 
         // TODO: Gameover
+        if(!gameEndedForMe)
+        {
+            PlayerCharacter p = GameObject.Find("Player").GetComponent<PlayerCharacter>();
+            Debug.Log("GameOver");
+            p.Stop();
+        }
 
-        PlayerCharacter p = GameObject.Find("Player").GetComponent<PlayerCharacter>();
-        Debug.Log("GameOver");
-        p.Stop();
+        Instantiate<Transform>(obstaclePrefab).position = transform.position;
 
         Destroy(this);
     }

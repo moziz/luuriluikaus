@@ -40,7 +40,7 @@ public class soundController : MonoBehaviour {
 		
 		
 		// running sound
-		if (myChar.currentSpeed > 0f && !myChar.isJumping && !myChar.gameOver){
+		if (myChar.currentSpeed > 0f && !myChar.isJumping && !myChar.gameEnding){
 			if (!runningAudio.isPlaying){
 				runningAudio.Play();
 			}
@@ -72,13 +72,13 @@ public class soundController : MonoBehaviour {
 				volleyPlayed = true;
 			}
 			
-			if (myChar.throwing && !throwingAudio.isPlaying && !volleyPlayed){
+			if (myChar.CurrentlyThrowing && !throwingAudio.isPlaying && !volleyPlayed){
 				//jumalautaAudio.clip = throwYell[Random.Range(0, throwYell.Length)];
 				throwingAudio.Play();
 				volleyPlayed = true;
 			}
 			
-			if (!myChar.throwing){
+			if (!myChar.CurrentlyThrowing){
 				volleyPlayed = false;
 			}
 			
@@ -88,7 +88,7 @@ public class soundController : MonoBehaviour {
 		}
 		
 		//gameover
-		if (myChar.gameOver){
+		if (myChar.gameEnding){
 		
 			if (!shutdownPlayed && !shutdownAudio.isPlaying){
 				shutdownAudio.Play();
