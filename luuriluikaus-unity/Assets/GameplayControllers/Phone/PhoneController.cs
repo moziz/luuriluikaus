@@ -127,7 +127,7 @@ public class PhoneController : MonoBehaviour {
             }
 
             //Debug.Log("Rotaty released. releaseDelta: " + rotaryReleaseDelta + " norm: " + numberRangeNormalized + " Output value: " + rotaryOutputValue);
-            Debug.Log("Phone dial released! Output: " + rotaryOutputValue);
+            // Debug.Log("Phone dial released! Output: " + rotaryOutputValue);
 
             if (event_rotaryRelease != null) {
                 event_rotaryRelease(rotaryOutputValue);

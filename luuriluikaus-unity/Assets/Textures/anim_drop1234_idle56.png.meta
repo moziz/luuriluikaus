@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7b085e79ee983884cab6d99725880649
-timeCreated: 1438379213
+timeCreated: 1438449467
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -8,6 +8,8 @@ TextureImporter:
     21300002: anim_drop1234_idle56_1
     21300004: anim_drop1234_idle56_2
     21300006: anim_drop1234_idle56_3
+    21300008: anim_drop1234_idle56_4
+    21300010: anim_drop1234_idle56_5
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -61,7 +63,7 @@ TextureImporter:
         width: 21
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: anim_drop1234_idle56_1
       rect:
@@ -71,7 +73,7 @@ TextureImporter:
         width: 19
         height: 31
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: anim_drop1234_idle56_2
       rect:
@@ -81,7 +83,7 @@ TextureImporter:
         width: 17
         height: 31
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: anim_drop1234_idle56_3
       rect:
@@ -90,6 +92,26 @@ TextureImporter:
         y: 0
         width: 15
         height: 30
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: anim_drop1234_idle56_4
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 0
+        width: 19
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: anim_drop1234_idle56_5
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 0
+        width: 22
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

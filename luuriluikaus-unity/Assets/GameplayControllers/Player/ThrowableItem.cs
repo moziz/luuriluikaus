@@ -28,11 +28,17 @@ public class ThrowableItem : MonoBehaviour
     public Vector2 startForceDirection = Vector2.zero;
 
     public Transform obstaclePrefab;
+    private static GameObject prevObstacle = null;
     public Transform player;
 
     public Vector3 offset = new Vector3(-1.0f, 1.0f, 1.0f);
 
     public List<ItemData> items = new List<ItemData>();
+
+    static private GameObject prevGameObject = null;
+
+    private float startX;
+    private float currentX;
 
     void Awake()
     {
@@ -55,6 +61,9 @@ public class ThrowableItem : MonoBehaviour
         inTheAir = false;
         inGround = false;
         gameEndedForMe = false;
+
+        GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: 0";
+
         LateUpdate();
     }
 
@@ -64,6 +73,15 @@ public class ThrowableItem : MonoBehaviour
         {
             transform.position = player.position + offset;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+            startX = transform.position.x;
+        }
+        if(inTheAir)
+        {
+            currentX = transform.position.x;
+
+            if(!gameEndedForMe)
+                GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: " + Mathf.RoundToInt(currentX - startX);
         }
     }
 
@@ -124,8 +142,20 @@ public class ThrowableItem : MonoBehaviour
             p.Stop();
         }
 
-        Instantiate<Transform>(obstaclePrefab).position = transform.position;
+
 
         Destroy(this);
+        if(prevObstacle)
+        {
+            Destroy(prevObstacle);
+        }
+        prevObstacle = Instantiate<Transform>(obstaclePrefab).gameObject;
+        prevObstacle.transform.position = transform.position;
+
+        if (prevGameObject)
+        {
+            Destroy(prevGameObject);
+        }
+        prevGameObject = gameObject;
     }
 }

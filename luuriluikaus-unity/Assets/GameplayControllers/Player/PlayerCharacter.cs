@@ -62,6 +62,8 @@ public class PlayerCharacter : MonoBehaviour
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
 
+    string[] tutorialTexts = { "Dial a number to run", "Dial a number to throw", "Run and volley!", "Dial 1 to jump" };
+
     void Start()
     {
         originalPosition = transform.position;
@@ -101,18 +103,16 @@ public class PlayerCharacter : MonoBehaviour
         tripAndFall = false;
         gameEnding = false;
         gameOver = false;
+        ChangeAnimation("stand");
         selectedNumber = -1;
     }
 
     void Restart()
     {
-        if (gameOverTime < Time.time)
-        {
-            transform.position = originalPosition;
-            gameOverTime = 0;
-            tripAndFall = false;
-            Start();
-        }
+        transform.position = originalPosition;
+        gameOverTime = 0;
+        tripAndFall = false;
+        Start();
     }
 
     void Update()
@@ -121,11 +121,6 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
-            if (gameOverTime == 0)
-            {
-                gameOverTime = Time.time + 0.3f;
-            }
-
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Restart();
@@ -186,10 +181,7 @@ public class PlayerCharacter : MonoBehaviour
             {
                 if (currentSpeed < minSpeed)
                 {
-                    if (oldSpeed >= minSpeed)
-                    {
-                        ChangeAnimation("stand");
-                    }
+                    ChangeAnimation("stand");
                 }
                 else
                 {
@@ -253,7 +245,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
-        if(gameOver && !useDebugControls)
+        if(gameOver)
         {
             Restart();
             return;
@@ -273,11 +265,13 @@ public class PlayerCharacter : MonoBehaviour
 
         if (readyToHurl)
         {
+            Debug.Log("HURL NUMBER: " + number);
             Hurl(number);
             readyToHurl = false;
         }
         else
         {
+            Debug.Log("RUN NUMBER: " + number);
             slowingDown = false;
 
             if (number == 1 && !readyToHurl)
