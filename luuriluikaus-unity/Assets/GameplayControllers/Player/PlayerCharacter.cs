@@ -44,7 +44,7 @@ public class PlayerCharacter : MonoBehaviour
     public bool slowDownTime = false;
     public bool readyToHurl = false;
     public bool useDebugControls = false;
-    private bool gameOver = false;
+    public bool gameOver = false;
     private Vector3 originalPosition;
     private float gameOverTime = 0;
     public bool hasThrown = false;
