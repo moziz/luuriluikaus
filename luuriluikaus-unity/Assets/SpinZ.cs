@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SpinZ : MonoBehaviour
-{
-
+public class SpinZ : MonoBehaviour {
     public float spinSpeed = -600.0f;
+    public Vector3 localRotationAxis = new Vector3(0f, 0f, 1f);
     public Quaternion origRot;
     ThrowableItem parent;
 
@@ -16,13 +15,8 @@ public class SpinZ : MonoBehaviour
 
     void Update()
     {
-        transform.rotation = origRot;
-
-        if (parent.inTheAir)
-        {
-            Vector3 rot = transform.eulerAngles;
-            rot.z += spinSpeed * Time.time;
-            transform.eulerAngles = rot;
+        if (parent.inTheAir) {
+            transform.rotation = origRot * Quaternion.AngleAxis(spinSpeed * Time.time, localRotationAxis);
         }
     }
 }
