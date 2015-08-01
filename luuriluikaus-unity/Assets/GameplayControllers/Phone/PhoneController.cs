@@ -120,11 +120,15 @@ public class PhoneController : MonoBehaviour {
             float numberRangeNormalized = (rotaryDelta - rotaryRangeNumbersBegin) / (rotaryRangeNumbersEnd - rotaryRangeNumbersBegin);
             rotaryOutputValue = (int)(numberRangeNormalized * rotaryDivision) + 1;
 
-            if (rotaryOutputValue == rotaryDivision) {
+            if (rotaryOutputValue < 0 || rotaryOutputValue > rotaryDivision || rotaryReleaseDelta < rotaryRangeNumbersBegin || rotaryReleaseDelta > rotaryRangeNumbersEnd) {
+                rotaryOutputValue = -1;
+            } else if (rotaryOutputValue == rotaryDivision) {
                 rotaryOutputValue = 0;
             }
 
-            Debug.Log("Rotaty released. releaseDelta: " + rotaryReleaseDelta + " norm: " + numberRangeNormalized + " Output value: " + rotaryOutputValue);
+            //Debug.Log("Rotaty released. releaseDelta: " + rotaryReleaseDelta + " norm: " + numberRangeNormalized + " Output value: " + rotaryOutputValue);
+            Debug.Log("Phone dial released! Output: " + rotaryOutputValue);
+
             if (event_rotaryRelease != null) {
                 event_rotaryRelease(rotaryOutputValue);
             }
