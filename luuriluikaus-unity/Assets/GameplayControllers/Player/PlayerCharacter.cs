@@ -15,17 +15,17 @@ public class PlayerCharacter : MonoBehaviour
     public float forwardVolleyForce = 1.0f;
     private List<Sprite> currentAnimation;
     public List<Sprite> standAnimation = new List<Sprite>();
-    public List<Sprite> runAnimation   = new List<Sprite>();
+    public List<Sprite> runAnimation = new List<Sprite>();
     public List<Sprite> carryAnimation = new List<Sprite>();
-    public List<Sprite> holdAnimation  = new List<Sprite>();
-    public List<Sprite> jumpAnimation  = new List<Sprite>();
-    public List<Sprite> fallAnimation  = new List<Sprite>();
-    public List<Sprite> hurlAnimation  = new List<Sprite>();
-    public List<Sprite> tripAnimation  = new List<Sprite>();
-    public List<Sprite> dieAnimation   = new List<Sprite>();
+    public List<Sprite> holdAnimation = new List<Sprite>();
+    public List<Sprite> jumpAnimation = new List<Sprite>();
+    public List<Sprite> fallAnimation = new List<Sprite>();
+    public List<Sprite> hurlAnimation = new List<Sprite>();
+    public List<Sprite> tripAnimation = new List<Sprite>();
+    public List<Sprite> dieAnimation = new List<Sprite>();
     public List<Sprite> giveUpAnimation = new List<Sprite>();
     private SpriteRenderer spriteRenderer;
-    
+
     public Transform throwableItemPrefab;
     private ThrowableItem currentItem;
     public GameObject throwFan;
@@ -39,6 +39,7 @@ public class PlayerCharacter : MonoBehaviour
     public float targetSpeed = 0;
     public float currentHeight = 0;
     public int selectedNumber = 0;
+    private float maxSpeed = 0.25f; // For spedometer
 
     public bool slowingDown = false;
     public bool goingUp = false;
@@ -62,12 +63,12 @@ public class PlayerCharacter : MonoBehaviour
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
 
-    TextMesh textMesh;
-    string tutorialStart = "Dial a number to run";
-    string tutorialThrow = "Dial a number to throw";
-    string tutorialDial1 = "Dial 1 to jump";
-    string tutorialVolley = "Run and volley!";
-    string tutorialRestart = "Dial any number to restart";
+    SpriteRenderer tutorialSpriteText;
+    public Sprite tutorialStart;
+    public Sprite tutorialThrow;
+    public Sprite tutorialDial1;
+    public Sprite tutorialVolley;
+    public Sprite tutorialRestart;
 
     void Awake()
     {
@@ -104,8 +105,8 @@ public class PlayerCharacter : MonoBehaviour
         currentSpeed = minSpeed;
         targetSpeed = currentSpeed;
 
-        textMesh = GameObject.Find("TutorialText").GetComponent<TextMesh>();
-        textMesh.text = tutorialStart;
+        tutorialSpriteText = GameObject.Find("TutorialText").GetComponent<SpriteRenderer>();
+        tutorialSpriteText.sprite = tutorialStart;
 
         pointer = transform.FindChild("Pointer");
         Transform spriteTransform = transform.FindChild("PlayerSprite");
@@ -126,7 +127,7 @@ public class PlayerCharacter : MonoBehaviour
         gameOverTime = 0;
         tripAndFall = false;
         Start();
-        textMesh.text = "";
+        tutorialSpriteText.sprite = null;
     }
 
     void Update()
@@ -135,7 +136,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
-            textMesh.text = tutorialRestart;
+            tutorialSpriteText.sprite = tutorialRestart;
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Restart();
@@ -151,7 +152,7 @@ public class PlayerCharacter : MonoBehaviour
             {
                 ChangeAnimation("trip");
             }
-            else if(dropAndGiveUp)
+            else if (dropAndGiveUp)
             {
                 ChangeAnimation("giveUp");
                 gameOver = true;
@@ -159,7 +160,7 @@ public class PlayerCharacter : MonoBehaviour
             else
             {
                 Debug.LogError("FAILURE IN GAME ENDING");
-            }    
+            }
         }
 
         if (useDebugControls || Input.GetKeyDown(KeyCode.Alpha9))
@@ -184,9 +185,9 @@ public class PlayerCharacter : MonoBehaviour
             float oldSpeed = currentSpeed;
             currentSpeed = Mathf.Max(0, currentSpeed - (!gameEnding ? speedDropOff : 0.2f) * localDeltaTime);
 
-            if(gameEnding)
+            if (gameEnding)
             {
-                if(currentSpeed <= minSpeed && currentAnimation == tripAnimation)
+                if (currentSpeed <= minSpeed && currentAnimation == tripAnimation)
                 {
                     gameOver = true;
                     ChangeAnimation("die");
@@ -212,6 +213,8 @@ public class PlayerCharacter : MonoBehaviour
             currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 10 * localDeltaTime);
         }
 
+        GameObject.Find("Spedometer").transform.localScale = new Vector3(Mathf.Clamp01(currentSpeed / maxSpeed), 1.0f, 1.0f);
+
         if (goingUp)
         {
             currentHeight = currentHeight + jumpSpeed * localDeltaTime;
@@ -219,7 +222,7 @@ public class PlayerCharacter : MonoBehaviour
             {
                 currentHeight = defaultHeight + jumpHeight;
                 goingUp = false;
-                if(!throwing)
+                if (!throwing)
                     ChangeAnimation("fall");
             }
         }
@@ -239,10 +242,10 @@ public class PlayerCharacter : MonoBehaviour
         Vector2 pos = transform.position + new Vector3(currentSpeed * (localDeltaTime * 60.0f), 0, 0);
         pos.y = currentHeight;
         transform.position = pos;
-        
+
         DoAnimation();
 
-        if(pointer != null && !gameEnding)
+        if (pointer != null && !gameEnding)
         {
             Transform target = currentItem.transform;
             pointer.LookAt(target, -Vector3.forward);
@@ -260,7 +263,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
-        textMesh.text = "";
+        tutorialSpriteText.sprite = null;
         if (gameOver)
         {
             Restart();
@@ -308,7 +311,7 @@ public class PlayerCharacter : MonoBehaviour
     void SetSpeed(float number) // Number from 1 to 9
     {
         Debug.Log("Set speed: " + number);
-        currentSpeed = speedCurve.Evaluate((number - 1) / 8.0f) * 9.0f  * speedMultiplier;
+        currentSpeed = speedCurve.Evaluate((number - 1) / 8.0f) * 9.0f * speedMultiplier;
     }
 
     void UnrollFinished()
@@ -327,7 +330,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void DropZoneReached()
     {
-        textMesh.text = tutorialThrow;
+        tutorialSpriteText.sprite = tutorialThrow;
         slowDownTime = true;
         readyToHurl = true;
         throwFan.SetActive(true);
@@ -339,16 +342,18 @@ public class PlayerCharacter : MonoBehaviour
         slowDownTime = false;
         goingUp = false; // Start falling if was mid-jump
         hasThrown = true;
-        
+
         currentItem.GetThrown();
 
         float forward = Mathf.Cos((number - 1) * 10 * Mathf.Deg2Rad);
         float up = Mathf.Sin(number * 10 * Mathf.Deg2Rad);
-        
+
         ThrowMe(currentItem.GetComponent<Rigidbody>(), forward * currentItem.forwardForceMult, up * currentItem.upwardForceMult);
 
         currentSpeed = 0;
         selectedNumber = -1;
+
+        tutorialSpriteText.sprite = tutorialVolley;
     }
 
     void DoTempControls()
@@ -426,11 +431,11 @@ public class PlayerCharacter : MonoBehaviour
         }
         else if (animationName == "stand")
         {
-            if(gameOver)
+            if (gameOver)
             {
                 currentAnimation = dieAnimation;
             }
-            else if(!hasThrown)
+            else if (!hasThrown)
             {
                 currentAnimation = holdAnimation;
             }
@@ -466,7 +471,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void ChangeAppropriateAnimation()
     {
-        if(gameEnding)
+        if (gameEnding)
         {
 
         }
@@ -559,7 +564,7 @@ public class PlayerCharacter : MonoBehaviour
         gameEnding = true;
         tripAndFall = true;
         slowingDown = true;
-        
+
         Rigidbody r = currentItem.GetComponent<Rigidbody>();
         currentItem.GetAbandoned();
 
