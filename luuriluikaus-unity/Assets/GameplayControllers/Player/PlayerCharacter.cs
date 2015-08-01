@@ -132,6 +132,12 @@ public class PlayerCharacter : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+            return;
+        }
+
         justThrew = false;
 
         if (gameOver)
