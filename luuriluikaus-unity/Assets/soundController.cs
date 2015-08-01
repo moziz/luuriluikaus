@@ -12,8 +12,10 @@ public class soundController : MonoBehaviour {
 	AudioSource shutdownAudio;
 	AudioSource startAudio;
 	AudioSource crashAudio;
+	AudioSource rotaryAudio;
 	
 	public AudioClip[] throwYell;
+	public AudioClip[] rotarySounds;
 	
 	bool jumpStarted = false;
 	bool throwPlayed = false;
@@ -32,6 +34,15 @@ public class soundController : MonoBehaviour {
 		shutdownAudio = transform.Find("shutdown").GetComponent<AudioSource>();
 		startAudio = transform.Find("start").GetComponent<AudioSource>();
 		crashAudio = transform.Find("crash").GetComponent<AudioSource>();
+		rotaryAudio = transform.Find("rotary").GetComponent<AudioSource>();
+		
+		
+		GameObject phone = GameObject.Find("Phone");
+		if (phone)
+		{
+			PhoneController p = phone.GetComponent<PhoneController>();
+			p.SubscribeOnRotaryRelease(NumberSelected);
+		}
 		
 	}
 	
@@ -109,5 +120,17 @@ public class soundController : MonoBehaviour {
 		
 		
 		
+	}
+	
+	void NumberSelected(int number)
+	{
+		if (number > 0){
+		rotaryAudio.clip = rotarySounds[number-1];
+		Debug.Log("number selected " + number);
+		}else{
+		rotaryAudio.clip = rotarySounds[9];
+		}
+		
+		rotaryAudio.Play();
 	}
 }
