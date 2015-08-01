@@ -69,6 +69,21 @@ public class PlayerCharacter : MonoBehaviour
     string tutorialVolley = "Run and volley!";
     string tutorialRestart = "Dial any number to restart";
 
+    void Awake()
+    {
+        GameObject phone = GameObject.Find("Phone");
+        if (phone)
+        {
+            PhoneController p = phone.GetComponent<PhoneController>();
+            p.SubscribeOnRotaryEnd(UnrollFinished);
+            p.SubscribeOnRotaryRelease(NumberSelected);
+        }
+        else
+        {
+            useDebugControls = true;
+        }
+    }
+
     void Start()
     {
         originalPosition = transform.position;
@@ -82,18 +97,6 @@ public class PlayerCharacter : MonoBehaviour
 
         {
             currentItem = Instantiate(throwableItemPrefab).GetComponent<ThrowableItem>();
-        }
-
-        GameObject phone = GameObject.Find("Phone");
-        if (phone)
-        {
-            PhoneController p = phone.GetComponent<PhoneController>();
-            p.SubscribeOnRotaryEnd(UnrollFinished);
-            p.SubscribeOnRotaryRelease(NumberSelected);
-        }
-        else
-        {
-            useDebugControls = true;
         }
 
         currentSpeed = minSpeed;
