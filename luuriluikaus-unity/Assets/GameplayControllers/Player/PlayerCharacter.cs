@@ -62,7 +62,12 @@ public class PlayerCharacter : MonoBehaviour
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
 
-    string[] tutorialTexts = { "Dial a number to run", "Dial a number to throw", "Run and volley!", "Dial 1 to jump" };
+    TextMesh textMesh;
+    string tutorialStart = "Dial a number to run";
+    string tutorialThrow = "Dial a number to throw";
+    string tutorialDial1 = "Dial 1 to jump";
+    string tutorialVolley = "Run and volley!";
+    string tutorialRestart = "Dial any number to restart";
 
     void Start()
     {
@@ -94,6 +99,9 @@ public class PlayerCharacter : MonoBehaviour
         currentSpeed = minSpeed;
         targetSpeed = currentSpeed;
 
+        textMesh = GameObject.Find("TutorialText").GetComponent<TextMesh>();
+        textMesh.text = tutorialStart;
+
         pointer = transform.FindChild("Pointer");
         Transform spriteTransform = transform.FindChild("PlayerSprite");
         spriteRenderer = spriteTransform.GetComponentInChildren<SpriteRenderer>();
@@ -113,6 +121,7 @@ public class PlayerCharacter : MonoBehaviour
         gameOverTime = 0;
         tripAndFall = false;
         Start();
+        textMesh.text = "";
     }
 
     void Update()
@@ -121,6 +130,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
+            textMesh.text = tutorialRestart;
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Restart();
@@ -245,7 +255,8 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
-        if(gameOver)
+        textMesh.text = "";
+        if (gameOver)
         {
             Restart();
             return;
@@ -291,6 +302,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void SetSpeed(float number) // Number from 1 to 9
     {
+        Debug.Log("Set speed: " + number);
         currentSpeed = speedCurve.Evaluate((number - 1) / 8.0f) * 9.0f  * speedMultiplier;
     }
 
@@ -310,6 +322,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void DropZoneReached()
     {
+        textMesh.text = tutorialThrow;
         slowDownTime = true;
         readyToHurl = true;
         throwFan.SetActive(true);
@@ -335,6 +348,8 @@ public class PlayerCharacter : MonoBehaviour
 
     void DoTempControls()
     {
+        return;
+
         if (Input.GetKey(KeyCode.Alpha1))
         {
             NumberSelected(1);
