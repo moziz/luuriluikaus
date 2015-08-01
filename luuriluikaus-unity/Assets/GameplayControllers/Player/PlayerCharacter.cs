@@ -242,7 +242,7 @@ public class PlayerCharacter : MonoBehaviour
             Transform target = currentItem.transform;
             pointer.LookAt(target, -Vector3.forward);
             float distance = (target.position - transform.position).magnitude;
-            if (distance > 10 || (transform.position.x - target.position.x) > 5 || (transform.position.y - target.position.y) > 5)
+            if (distance > 10 || (transform.position.x - target.position.x) > 3 || (transform.position.y - target.position.y) > 5)
             {
                 pointer.gameObject.SetActive(true);
             }

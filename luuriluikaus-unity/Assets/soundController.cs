@@ -56,7 +56,7 @@ public class soundController : MonoBehaviour {
 				runningAudio.Play();
 			}
 			
-			runningAudio.pitch = 1f + myChar.currentSpeed * 5.0f;
+			runningAudio.pitch = (1f + myChar.currentSpeed * 5.0f) * myChar.ownDeltaTime;
 			
 		}else{
 			runningAudio.Stop();
