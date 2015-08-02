@@ -6,7 +6,7 @@ public class StartScreen : MonoBehaviour
 
     GameObject numberChild;
     int numbersToReceive = 5;
-
+    
     void Start()
     {
         numberChild = transform.GetChild(0).gameObject;

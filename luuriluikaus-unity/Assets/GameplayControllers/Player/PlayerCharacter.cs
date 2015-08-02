@@ -62,7 +62,7 @@ public class PlayerCharacter : MonoBehaviour
     private bool justThrew = false;
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
-
+    GameObject restartText;
     public bool notStarted = true;
 
     void Awake()
@@ -108,6 +108,9 @@ public class PlayerCharacter : MonoBehaviour
         gameOver = false;
         ChangeAnimation("stand");
         selectedNumber = -1;
+
+        restartText = GameObject.Find("RestartText");
+        restartText.SetActive(false);
     }
 
     void Restart()
@@ -116,7 +119,6 @@ public class PlayerCharacter : MonoBehaviour
         gameOverTime = 0;
         tripAndFall = false;
         Start();
-        // Hide "restart?" message
     }
 
     void Update()
@@ -133,7 +135,6 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
-            // Show "restart?" message
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Restart();
@@ -188,6 +189,8 @@ public class PlayerCharacter : MonoBehaviour
                 {
                     gameOver = true;
                     ChangeAnimation("die");
+                    restartText.SetActive(true);
+                    pointer.gameObject.SetActive(false);
                 }
             }
             else if (!throwing)
@@ -264,7 +267,10 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
-            Restart();
+            if(gameOverTime + 0.7f < Time.time)
+            {
+                Restart();
+            }
             return;
         }
 
@@ -553,6 +559,7 @@ public class PlayerCharacter : MonoBehaviour
 
     public void TripAndFall()
     {
+        gameOverTime = Time.time;
         gameEnding = true;
         tripAndFall = true;
         slowingDown = true;
@@ -575,9 +582,13 @@ public class PlayerCharacter : MonoBehaviour
 
     public void Stop()
     {
+        gameOverTime = Time.time;
         gameEnding = true;
         dropAndGiveUp = true;
         slowingDown = true;
+
+        restartText.SetActive(true);
+        pointer.gameObject.SetActive(false);
     }
 
     public void StartGame()
