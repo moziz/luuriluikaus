@@ -12,7 +12,7 @@ public class TravelBetweenTwoTransforms : MonoBehaviour
     public float target = 1;
     float speed = 1;
     bool visible = true;
-
+    bool firstTrip = true;
     void Start()
     {
 
@@ -33,6 +33,11 @@ public class TravelBetweenTwoTransforms : MonoBehaviour
                     }
                     else
                     {
+                        if(firstTrip)
+                        {
+                            firstTrip = false;
+                            GameObject.Find("Receiver").GetComponent<LiftHandle>().DoYourThing();
+                        }
                         target = 0;
                     }
                     break;
