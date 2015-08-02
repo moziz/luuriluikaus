@@ -94,7 +94,7 @@ public class PlayerCharacter : MonoBehaviour
             currentItem = Instantiate(throwableItemPrefab).GetComponent<ThrowableItem>();
         }
 
-        currentSpeed = minSpeed;
+        currentSpeed = 0;
         targetSpeed = currentSpeed;
         
         pointer = transform.FindChild("Pointer");
