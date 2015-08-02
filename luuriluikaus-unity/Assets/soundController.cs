@@ -48,7 +48,10 @@ public class soundController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(myChar.notStarted)
+        {
+            return;
+        }
 		
 		// running sound
 		if (myChar.currentSpeed > 0f && !myChar.isJumping && !myChar.gameEnding){
@@ -112,7 +115,7 @@ public class soundController : MonoBehaviour {
 			shutdownPlayed = false;
 			
 			 // game start
-			if (!startAudio.isPlaying && !startPlayed && !myChar.notStarted){
+			if (!startAudio.isPlaying && !startPlayed){
 				startAudio.Play();
 				startPlayed = true;
 			}
