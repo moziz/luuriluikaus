@@ -62,9 +62,12 @@ public class PlayerCharacter : MonoBehaviour
     private bool justThrew = false;
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
-    
+
+    public bool notStarted = true;
+
     void Awake()
     {
+        notStarted = true;
         GameObject.Find("ScoreText").GetComponent<TextMesh>().text = "SCORE: 0";
 
         GameObject phone = GameObject.Find("Phone");
@@ -118,7 +121,9 @@ public class PlayerCharacter : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (notStarted) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
             return;
@@ -255,6 +260,8 @@ public class PlayerCharacter : MonoBehaviour
 
     void NumberSelected(int number)
     {
+        if (notStarted) return;
+
         if (gameOver)
         {
             Restart();
@@ -305,6 +312,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void UnrollFinished()
     {
+        if (notStarted) return;
         slowingDown = true;
         selectedNumber = -1;
     }
@@ -570,5 +578,10 @@ public class PlayerCharacter : MonoBehaviour
         gameEnding = true;
         dropAndGiveUp = true;
         slowingDown = true;
+    }
+
+    public void StartGame()
+    {
+        notStarted = false;
     }
 }

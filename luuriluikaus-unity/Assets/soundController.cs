@@ -112,7 +112,7 @@ public class soundController : MonoBehaviour {
 			shutdownPlayed = false;
 			
 			 // game start
-			if (!startAudio.isPlaying && !startPlayed){
+			if (!startAudio.isPlaying && !startPlayed && !myChar.notStarted){
 				startAudio.Play();
 				startPlayed = true;
 			}
