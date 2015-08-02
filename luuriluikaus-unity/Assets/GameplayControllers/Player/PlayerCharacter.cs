@@ -62,13 +62,6 @@ public class PlayerCharacter : MonoBehaviour
     private bool justThrew = false;
     public bool CurrentlyThrowing { get { return throwing || justThrew; } } // For sounds
     Transform pointer;
-
-    SpriteRenderer tutorialSpriteText;
-    public Sprite tutorialStart;
-    public Sprite tutorialThrow;
-    public Sprite tutorialDial1;
-    public Sprite tutorialVolley;
-    public Sprite tutorialRestart;
     
     void Awake()
     {
@@ -104,10 +97,7 @@ public class PlayerCharacter : MonoBehaviour
 
         currentSpeed = minSpeed;
         targetSpeed = currentSpeed;
-
-        tutorialSpriteText = GameObject.Find("TutorialText").GetComponent<SpriteRenderer>();
-        tutorialSpriteText.sprite = tutorialStart;
-
+        
         pointer = transform.FindChild("Pointer");
         Transform spriteTransform = transform.FindChild("PlayerSprite");
         spriteRenderer = spriteTransform.GetComponentInChildren<SpriteRenderer>();
@@ -127,8 +117,7 @@ public class PlayerCharacter : MonoBehaviour
         gameOverTime = 0;
         tripAndFall = false;
         Start();
-        tutorialSpriteText.sprite = null;
-        tutorialSpriteText.enabled = false;
+        // Hide "restart?" message
     }
 
     void Update()
@@ -143,7 +132,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (gameOver)
         {
-            tutorialSpriteText.sprite = tutorialRestart;
+            // Show "restart?" message
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Restart();
@@ -293,8 +282,6 @@ public class PlayerCharacter : MonoBehaviour
             Debug.Log("HURL NUMBER: " + number);
             Hurl(number);
             readyToHurl = false;
-
-            tutorialSpriteText.sprite = tutorialVolley;
         }
         else
         {
@@ -305,19 +292,9 @@ public class PlayerCharacter : MonoBehaviour
             {
                 if (!isJumping)
                     Jump();
-
-                tutorialSpriteText.sprite = null;
             }
             else
             {
-                if(tutorialSpriteText.sprite == tutorialStart)
-                {
-                    tutorialSpriteText.sprite = tutorialDial1;
-                }
-                else if(tutorialSpriteText.sprite != tutorialDial1)
-                {
-                    tutorialSpriteText.sprite = null;
-                }
                 ChangeAnimation("run");
                 SetSpeed(number);
                 targetSpeed = currentSpeed;
@@ -348,7 +325,6 @@ public class PlayerCharacter : MonoBehaviour
 
     void DropZoneReached()
     {
-        tutorialSpriteText.sprite = tutorialThrow;
         slowDownTime = true;
         readyToHurl = true;
         throwFan.SetActive(true);

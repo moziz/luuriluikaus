@@ -150,7 +150,8 @@ public class PhoneController : MonoBehaviour {
         }
 
         // Update visualization
-        if (state == RotaryState.selecting || state == RotaryState.rollback) {
+        //if (state == RotaryState.selecting || state == RotaryState.rollback)
+        {
             rotaryTrans.rotation = Quaternion.AngleAxis((rotaryDelta + rotaryRangeBegin) * 360f, originalOrientation * Vector3.up) * originalOrientation;
         }
     }
