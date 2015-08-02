@@ -97,7 +97,7 @@ public class PhoneController : MonoBehaviour {
         if (state == RotaryState.selecting) {
             float newDelta = currentInputAngle - rotateStart;
 
-            if (newDelta > rotaryDelta) {
+            if (newDelta > rotaryDelta && newDelta - rotaryDelta < 0.25f) {
                 rotaryDelta = currentInputAngle - rotateStart;
 
                 // Prevent going over end
@@ -150,8 +150,7 @@ public class PhoneController : MonoBehaviour {
         }
 
         // Update visualization
-        //if (state == RotaryState.selecting || state == RotaryState.rollback)
-        {
+        if (state == RotaryState.selecting || state == RotaryState.rollback) {
             rotaryTrans.rotation = Quaternion.AngleAxis((rotaryDelta + rotaryRangeBegin) * 360f, originalOrientation * Vector3.up) * originalOrientation;
         }
     }

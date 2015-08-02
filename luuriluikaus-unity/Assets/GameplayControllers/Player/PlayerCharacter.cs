@@ -50,7 +50,7 @@ public class PlayerCharacter : MonoBehaviour
     public float ownDeltaTime = 1;
     public bool slowDownTime = false;
     public bool readyToHurl = false;
-    public bool useDebugControls = false;
+    //public bool useDebugControls = false;
     public bool gameEnding = false;
     private bool tripAndFall = false;
     private bool dropAndGiveUp = false;
@@ -73,10 +73,6 @@ public class PlayerCharacter : MonoBehaviour
             PhoneController p = phone.GetComponent<PhoneController>();
             p.SubscribeOnRotaryEnd(UnrollFinished);
             p.SubscribeOnRotaryRelease(NumberSelected);
-        }
-        else
-        {
-            useDebugControls = true;
         }
     }
 
@@ -159,11 +155,11 @@ public class PlayerCharacter : MonoBehaviour
             }
         }
 
-        if (useDebugControls || Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            useDebugControls = true;
-            DoTempControls();
-        }
+        //if (useDebugControls || Input.GetKeyDown(KeyCode.Alpha9))
+        //{
+        //    useDebugControls = true;
+        //    DoTempControls();
+        //}
 
         if (slowDownTime)
         {
@@ -279,13 +275,11 @@ public class PlayerCharacter : MonoBehaviour
 
         if (readyToHurl)
         {
-            Debug.Log("HURL NUMBER: " + number);
             Hurl(number);
             readyToHurl = false;
         }
         else
         {
-            Debug.Log("RUN NUMBER: " + number);
             slowingDown = false;
 
             if (number == 1 && !readyToHurl)
@@ -305,7 +299,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void SetSpeed(float number) // Number from 1 to 9
     {
-        Debug.Log("Set speed: " + number);
+        //Debug.Log("Set speed: " + number);
         currentSpeed = speedCurve.Evaluate((number - 1) / 8.0f) * 9.0f * speedMultiplier;
     }
 
@@ -350,8 +344,6 @@ public class PlayerCharacter : MonoBehaviour
 
     void DoTempControls()
     {
-        return;
-
         if (Input.GetKey(KeyCode.Alpha1))
         {
             NumberSelected(1);
@@ -455,7 +447,7 @@ public class PlayerCharacter : MonoBehaviour
 
         if (currentAnimation != oldAnimation)
         {
-            Debug.Log("ChangingAnimation: " + animationName);
+            //Debug.Log("ChangingAnimation: " + animationName);
             lastAnimationFrameSwap = -100;
             animationFrame = -1;
         }
@@ -557,15 +549,18 @@ public class PlayerCharacter : MonoBehaviour
         tripAndFall = true;
         slowingDown = true;
 
-        Rigidbody r = currentItem.GetComponent<Rigidbody>();
-        currentItem.GetAbandoned();
-
-        if (!hasThrown)
+        if(currentItem)
         {
-            currentItem.GetThrown();
+            currentItem.GetAbandoned();
 
-            r.velocity = new Vector3(currentSpeed, 0, 0);
-            r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed), upwardVolleyForce * (0.1f + Random.value * 0.2f) + currentHeight));
+            if (!hasThrown)
+            {
+                currentItem.GetThrown();
+
+                Rigidbody r = currentItem.GetComponent<Rigidbody>();
+                r.velocity = new Vector3(currentSpeed, 0, 0);
+                r.AddForce(new Vector3((forwardVolleyForce * (0.8f + Random.value) + currentSpeed), upwardVolleyForce * (0.1f + Random.value * 0.2f) + currentHeight));
+            }
         }
 
     }
